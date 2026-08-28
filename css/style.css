@@ -196,11 +196,11 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
 .pod-wrap{
   position:absolute; left:50%; top:55%; width:min(74vh, 84vw, 640px); height:auto; aspect-ratio:1;
   transform:translate(-50%,-50%); z-index:2; will-change:transform,opacity;
-  mix-blend-mode:multiply;
+  filter:drop-shadow(0 26px 34px rgba(46,32,25,.42));
 }
 .pod-photo{
   width:100%; height:100%; object-fit:contain; user-select:none; -webkit-user-drag:none;
-  filter:brightness(1.3) contrast(1.6) saturate(.92);
+  opacity:0; transition:opacity .35s var(--ease);
   animation:flutua 6s ease-in-out infinite;   /* o pod boia de leve */
 }
 @keyframes flutua{

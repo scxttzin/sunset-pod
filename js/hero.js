@@ -31,6 +31,73 @@
     g.innerHTML = d + '</g>';
   }
 
+  /* ================= foto do pod sem fundo =================
+     A foto vem com fundo branco e uma sombra de estudio em volta. Antes ela
+     era encaixada no ceu com mix-blend-mode: multiply, mas isso arrastava
+     essa sombra sobre o sol e, no Safari do iPhone, embaralhava a cor do
+     fundo inteiro. Aqui o fundo e removido de verdade, por preenchimento a
+     partir das bordas, preservando o branco de dentro do aparelho.        */
+  function recortarPod() {
+    var el = document.getElementById('podPhoto');
+    if (!el) return;
+    var origem = new Image();
+    origem.onload = function () {
+      var url = semFundo(origem);
+      if (url) el.src = url;
+      el.style.opacity = '1';
+    };
+    origem.onerror = function () { el.style.opacity = '1'; };
+    origem.src = el.getAttribute('src');
+  }
+
+  function semFundo(img) {
+    var W = img.naturalWidth, H = img.naturalHeight;
+    if (!W || !H) return null;
+    var cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    var cx = cv.getContext('2d', { willReadFrequently: true });
+    cx.drawImage(img, 0, 0);
+
+    var dados;
+    try { dados = cx.getImageData(0, 0, W, H); } catch (e) { return null; }
+    var px = dados.data;
+    var visto = new Uint8Array(W * H);
+    var pilha = [];
+    var i, p;
+
+    function claro(n) { var o = n * 4; return Math.min(px[o], px[o + 1], px[o + 2]) >= 190; }
+
+    for (i = 0; i < W; i++) pilha.push(i, (H - 1) * W + i);
+    for (i = 0; i < H; i++) pilha.push(i * W, i * W + W - 1);
+
+    while (pilha.length) {
+      p = pilha.pop();
+      if (visto[p]) continue;
+      visto[p] = 1;
+      if (!claro(p)) continue;
+      px[p * 4 + 3] = 0;
+      var x = p % W, y = (p / W) | 0;
+      if (x > 0) pilha.push(p - 1);
+      if (x < W - 1) pilha.push(p + 1);
+      if (y > 0) pilha.push(p - W);
+      if (y < H - 1) pilha.push(p + W);
+    }
+
+    // suaviza o serrilhado: pixel claro encostado no vazio perde opacidade
+    for (var yy = 1; yy < H - 1; yy++) {
+      for (var xx = 1; xx < W - 1; xx++) {
+        var k = yy * W + xx;
+        if (px[k * 4 + 3] === 0) continue;
+        if (px[(k - 1) * 4 + 3] && px[(k + 1) * 4 + 3] && px[(k - W) * 4 + 3] && px[(k + W) * 4 + 3]) continue;
+        var lum = 0.299 * px[k * 4] + 0.587 * px[k * 4 + 1] + 0.114 * px[k * 4 + 2];
+        if (lum > 150) px[k * 4 + 3] = Math.max(0, Math.round(255 - (lum - 150) * 3.4));
+      }
+    }
+
+    cx.putImageData(dados, 0, 0);
+    return cv.toDataURL('image/png');
+  }
+
   /* ================= barra do topo ================= */
   // único efeito ligado ao scroll: a barra escurece sobre a sessão de
   // promoções e a logo cresce enquanto o topo da hero está em cena
@@ -195,6 +262,7 @@
     if (!showcase) return;
 
     buildSun('sunRays', 94, 188, 15, 200, 200);
+    recortarPod();
     fitSea();
     if (mqEstreito && mqEstreito.addEventListener) mqEstreito.addEventListener('change', fitSea);
     bindCarousel();

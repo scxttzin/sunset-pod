@@ -720,11 +720,19 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
 
   /* hero: frase maior, pod maior e tudo com folga */
   .stage{ height:138vh; }
-  .hero-copy{ padding:calc(var(--nav-h) + 6vh) 6vw 13vh; }  /* espaço pra logo saltada */
+  .hero-copy{ padding:calc(var(--nav-h) + 6vh) 6vw 10vh; }  /* espaço pra logo saltada */
+
+  /* no topo da hero a barra fica transparente: com fundo próprio ela criava
+     um degrau visível contra o céu. O recorte sobe pra cobrir o notch. */
+  .nav::before{ top:calc(-1 * env(safe-area-inset-top, 0px)); }
+  body.hero-logo .nav::before{
+    background:transparent; backdrop-filter:none; border-bottom-color:transparent;
+  }
   .hero-title{ font-size:clamp(2.9rem,12.5vw,4.2rem); line-height:.94; }
   .hero-sub{ font-size:1rem; max-width:32ch; padding:12px 20px; }
   .kicker{ font-size:.64rem; letter-spacing:.18em; margin-bottom:10px; }
-  .pod-wrap{ width:min(128vw,600px); top:55%; }
+  /* o pod encostava no subtítulo: subiu um pouco e cedeu alguns pontos */
+  .pod-wrap{ width:min(104vw,440px); top:50%; }
   .hero-sun{ width:min(124vw,540px); top:61%; }
 
   .scroll-cue{ bottom:10px; font-size:.62rem; }

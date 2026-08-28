@@ -18,7 +18,7 @@
   var DEFAULT_SETTINGS = {
     whatsapp: '5521987390771',
     msgTemplate: 'Olá! Vim pelo site da Sunset Pod. Quero saber sobre: *{produto}* — {preco}.',
-    instagram: '@sunsetpod',
+    instagram: '@sunsetpodrj',
     heroTitle: 'O pôr do sol',
     heroTitleHl: 'cabe no bolso',
     heroSub: 'Pods e vapes selecionados, veja as promoções',

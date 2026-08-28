@@ -10,11 +10,11 @@
    navegador do cliente que existe conteúdo novo.
    ===================================================================== */
 window.SUNSET_SEED = {
-  "version": 7,
+  "version": 8,
   "settings": {
     "whatsapp": "5521987390771",
     "msgTemplate": "Opa! Vim pelo site da Sunset Pod 🌅\nQuero saber sobre: *{produto}* — {preco}.\nAinda tem disponível?",
-    "instagram": "@sunsetpod",
+    "instagram": "@sunsetpodrj",
     "heroTitle": "O pôr do sol",
     "heroTitleHl": "cabe no bolso",
     "heroSub": "Pods e vapes selecionados, veja as promoções",

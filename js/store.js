@@ -16,7 +16,7 @@
   var SEED = global.SUNSET_SEED ? clone(global.SUNSET_SEED) : defaultSeed();
 
   var DEFAULT_SETTINGS = {
-    whatsapp: '5521999999999',
+    whatsapp: '5521987390771',
     msgTemplate: 'Olá! Vim pelo site da Sunset Pod. Quero saber sobre: *{produto}* — {preco}.',
     instagram: '@sunsetpod',
     heroTitle: 'O pôr do sol',

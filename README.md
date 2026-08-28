@@ -79,7 +79,7 @@ index.html            as três abas
 css/style.css         identidade visual (bege, laranja, marrom)
 js/store.js           dados: catálogo, configurações, importar/exportar
 js/ui.js              cards, ficha do produto, avisos
-js/hero.js            animação da hero, fumaça em canvas e carrossel
+js/hero.js            sol e horizonte da hero, carrossel e faixa animada
 js/shop.js            busca, filtros e grade da loja
 js/admin.js           painel administrativo
 js/app.js             navegação entre as abas
@@ -99,6 +99,6 @@ dev-server.mjs        servidor local pra testar
 - **Imagens enviadas pelo painel** ficam embutidas nos dados. O navegador guarda uns 5 MB
   no total, então prefira URLs de imagem quando o catálogo crescer.
 - **Trocar o número do WhatsApp:** Adm → Configurações → Número do WhatsApp (com DDI e DDD,
-  só números: `5521999999999`). Vale para todos os botões do site de uma vez.
+  só números — hoje `5521987390771`). Vale para todos os botões do site de uma vez.
 - O rodapé traz o aviso legal de venda proibida para menores de 18 anos e de presença de
   nicotina — recomendo manter, é exigência da Anvisa para esse tipo de produto.

@@ -10,14 +10,14 @@
    navegador do cliente que existe conteúdo novo.
    ===================================================================== */
 window.SUNSET_SEED = {
-  "version": 4,
+  "version": 5,
   "settings": {
     "whatsapp": "5521999999999",
     "msgTemplate": "Opa! Vim pelo site da Sunset Pod 🌅\nQuero saber sobre: *{produto}* — {preco}.\nAinda tem disponível?",
     "instagram": "@sunsetpod",
     "heroTitle": "O pôr do sol",
     "heroTitleHl": "cabe no bolso",
-    "heroSub": "Pods e vapes selecionados, preço de amigo e aquela vibe de fim de tarde na praia.",
+    "heroSub": "Pods e vapes selecionados, veja as promoções",
     "showcaseKicker": "A fumaça baixou. A promoção apareceu.",
     "tickerItems": "Entrega no mesmo dia,Só produto original,Pix e cartão,Zona Sul · Barra · Centro,Combo com desconto,Atendimento pelo Zap",
     "storeOpen": true,

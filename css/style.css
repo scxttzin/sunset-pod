@@ -141,10 +141,10 @@ body.nav-dark .tab.is-on{ background:var(--laranja); color:#fff; }
 body.nav-dark .nav-burger span{ background:var(--areia-2); }
 
 /* ============================ HERO / PALCO ============================ */
-.stage{ position:relative; height:148vh; }
+.stage{ position:relative; }
 
 .hero{
-  position:sticky; top:0; height:100svh; overflow:hidden;
+  position:relative; height:100svh; overflow:hidden;
   display:flex; align-items:center; justify-content:center;
 }
 .hero-sky{
@@ -218,10 +218,6 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
 .scroll-cue circle{ fill:currentColor; stroke:none; animation:wheel 1.9s var(--ease) infinite; }
 @keyframes wheel{ 0%{ transform:translateY(0); opacity:1 } 70%{ transform:translateY(13px); opacity:0 } 100%{ opacity:0 } }
 
-#smoke{
-  position:fixed; inset:0; width:100%; height:100%; z-index:3;
-  pointer-events:none; opacity:0; transition:opacity .35s linear;
-}
 
 /* ============================ SESSÃO 2 — SHOWCASE ============================ */
 .showcase{
@@ -719,8 +715,7 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
   .nav-burger{ display:block; flex:none; }
 
   /* hero: frase maior, pod maior e tudo com folga */
-  .stage{ height:138vh; }
-  .hero-copy{ padding:calc(var(--nav-h) + 6vh) 6vw 7vh; }  /* espaço pra logo saltada */
+  .hero-copy{ padding:calc(var(--nav-h) + 4vh) 6vw 6vh; }  /* espaço pra logo saltada */
 
   /* a barra continua visível; o degrau vinha da cor. Agora ela usa o mesmo
      tom do topo do céu e, na hero, dispensa a linha de baixo. */
@@ -732,11 +727,13 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
   .hero-title{ font-size:clamp(2.9rem,12.5vw,4.2rem); line-height:.94; }
   .hero-sub{ font-size:1rem; max-width:32ch; padding:12px 20px; }
   .kicker{ font-size:.64rem; letter-spacing:.18em; margin-bottom:10px; }
-  /* pod grande de novo: ganhou espaço subindo e apertando o rodapé da hero */
-  .pod-wrap{ width:min(124vw,540px); top:48%; }
-  .hero-sun{ width:min(124vw,540px); top:61%; }
+  /* pod e sol no mesmo centro, abaixados pra não encostar no título */
+  .pod-wrap{ width:min(110vw,460px); top:56%; }
+  .hero-sun{ width:min(104vw,440px); top:56%; }
 
-  .scroll-cue{ bottom:4px; font-size:.58rem; gap:5px; }
+  /* só o ícone: a legenda encostava no subtítulo */
+  .scroll-cue{ bottom:8px; gap:0; }
+  .scroll-cue span{ display:none; }
   .scroll-cue svg{ width:18px; height:30px; }
 
   /* sessão da promoção */

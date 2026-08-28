@@ -22,9 +22,8 @@ Depois acesse `http://localhost:5173`.
 ## As três abas
 
 **Início** — hero com o pod flutuando no pôr do sol carioca (Dois Irmãos à esquerda, Pão
-de Açúcar à direita). Ao rolar a página o pod desce, gira até ficar de ponta pra baixo e
-solta a fumaça pela boca; essa fumaça inunda a tela e vira o fundo da segunda sessão, onde
-ficam o botão **Conferir loja** e o carrossel de promoções passando um a um.
+de Açúcar à direita). Logo abaixo vem a sessão escura de promoções, com o botão
+**Conferir loja** e o carrossel passando um a um, o card do meio em destaque.
 
 **Pods** — a loja. Barra de busca fixa no topo (procura por nome, marca, sabor, tag ou
 puffs, e ignora acentos), botão **Filtros** que abre o painel de tags agrupadas por puffs,

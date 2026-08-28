@@ -21,7 +21,7 @@
     instagram: '@sunsetpod',
     heroTitle: 'O pôr do sol',
     heroTitleHl: 'cabe no bolso',
-    heroSub: 'Pods e vapes selecionados, preço de amigo e aquela vibe de fim de tarde na praia.',
+    heroSub: 'Pods e vapes selecionados, veja as promoções',
     showcaseKicker: 'A fumaça baixou. A promoção apareceu.',
     tickerItems: 'Entrega no mesmo dia,Só produto original,Pix e cartão,Atendimento pelo Zap',
     storeOpen: true,

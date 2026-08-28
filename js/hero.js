@@ -56,7 +56,11 @@
     var cv = document.createElement('canvas');
     cv.width = W; cv.height = H;
     var cx = cv.getContext('2d', { willReadFrequently: true });
+    // mesmo realce que existia no CSS antes do multiply: e ele que mantem o
+    // corpo preto e estoura o branco do logo, em vez de tudo virar marrom
+    try { cx.filter = 'brightness(1.3) contrast(1.6) saturate(0.92)'; } catch (e) {}
     cx.drawImage(img, 0, 0);
+    cx.filter = 'none';
 
     var dados;
     try { dados = cx.getImageData(0, 0, W, H); } catch (e) { return null; }
@@ -97,17 +101,16 @@
     // Devolve o brilho quente que o multiply dava: ali o branco do aparelho
     // pegava a cor do sol atrás. Agora esse laranja é pintado na própria
     // imagem, então o visual é o mesmo sem depender do fundo.
+    // É a mesma conta que o multiply fazia contra o sol — cor x sol / 255 —
+    // só que aplicada de uma vez na imagem. O aparelho inteiro pega o tom
+    // quente, o branco de dentro vira laranja e o corpo escuro segue escuro.
     var SOL = [235, 95, 30];
     for (var n = 0; n < W * H; n++) {
       var o = n * 4;
-      if (px[o + 3] !== 255) continue;                 // borda suavizada fica como está
-      var l = 0.299 * px[o] + 0.587 * px[o + 1] + 0.114 * px[o + 2];
-      if (l <= 120) continue;                          // corpo escuro do aparelho não muda
-      var t = Math.min(1, (l - 120) / 90);             // quanto mais claro, mais laranja
-      var f = l / 255;                                 // multiply: branco vira o sol cheio
-      px[o]     = Math.round(px[o]     + (SOL[0] * f - px[o])     * t);
-      px[o + 1] = Math.round(px[o + 1] + (SOL[1] * f - px[o + 1]) * t);
-      px[o + 2] = Math.round(px[o + 2] + (SOL[2] * f - px[o + 2]) * t);
+      if (px[o + 3] === 0) continue;
+      px[o]     = (px[o]     * SOL[0]) / 255;
+      px[o + 1] = (px[o + 1] * SOL[1]) / 255;
+      px[o + 2] = (px[o + 2] * SOL[2]) / 255;
     }
 
     cx.putImageData(dados, 0, 0);

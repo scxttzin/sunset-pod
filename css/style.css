@@ -716,7 +716,7 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
   .nav-burger{ display:block; flex:none; }
 
   /* hero: frase maior, pod maior e tudo com folga */
-  .hero-copy{ padding:calc(var(--nav-h) + 4vh) 6vw 6vh; }  /* espaço pra logo saltada */
+  .hero-copy{ padding:calc(var(--nav-h) + 7vh) 6vw 6vh; }  /* espaço pra logo saltada */
 
   /* a barra continua visível; o degrau vinha da cor. Agora ela usa o mesmo
      tom do topo do céu e, na hero, dispensa a linha de baixo. */
@@ -729,8 +729,8 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
   .hero-sub{ font-size:1rem; max-width:32ch; padding:12px 20px; }
   .kicker{ font-size:.64rem; letter-spacing:.18em; margin-bottom:10px; }
   /* pod e sol no mesmo centro, abaixados pra não encostar no título */
-  .pod-wrap{ width:min(110vw,460px); top:56%; }
-  .hero-sun{ width:min(104vw,440px); top:56%; }
+  .pod-wrap{ width:min(102vw,430px); top:57%; }
+  .hero-sun{ width:min(98vw,415px); top:57%; }
 
   /* só o ícone: a legenda encostava no subtítulo */
   .scroll-cue{ bottom:8px; gap:0; }

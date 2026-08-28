@@ -1,0 +1,6 @@
+# ferramentas locais de desenvolvimento
+.claude/
+
+# lixo de sistema
+Thumbs.db
+.DS_Store

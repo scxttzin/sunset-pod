@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Sunset Pod — Vapes com energia carioca</title>
+<meta name="description" content="Sunset Pod — vitrine de pods e vapes com entrega no Rio de Janeiro. Escolha o seu e chame no WhatsApp." />
+<meta name="theme-color" content="#F0DCB8" />
+<link rel="icon" href="assets/logo-sunset.png" />
+<meta property="og:title" content="Sunset Pod" />
+<meta property="og:description" content="Pods, vapes e sabores com energia carioca. Peça pelo WhatsApp." />
+<meta property="og:image" content="assets/logo-sunset.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-view="inicio">
+
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <a class="nav-brand" href="#/inicio" aria-label="Sunset Pod — início">
+    <img src="assets/logo-sunset.png" alt="" />
+    <span>Sunset<em>pod</em></span>
+  </a>
+
+  <nav class="nav-tabs" role="tablist">
+    <a href="#/inicio" data-tab="inicio" class="tab">Início</a>
+    <a href="#/pods"   data-tab="pods"   class="tab">Pods</a>
+    <a href="#/adm"    data-tab="adm"    class="tab tab-adm">Adm</a>
+  </nav>
+
+  <a class="nav-zap js-zap" href="#" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2A9.9 9.9 0 0 0 2.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 0 0 4.74 1.2h.01a9.9 9.9 0 0 0 9.9-9.9A9.9 9.9 0 0 0 12.04 2Zm5.8 14.05c-.24.68-1.42 1.3-1.96 1.34-.5.05-.98.23-3.32-.69-2.8-1.1-4.57-3.96-4.71-4.15-.14-.19-1.13-1.5-1.13-2.86 0-1.36.71-2.03.96-2.31.25-.28.55-.35.73-.35h.52c.17 0 .4-.06.62.47.24.57.8 1.98.87 2.12.07.14.12.3.02.49-.09.19-.14.3-.28.47l-.42.48c-.14.14-.28.29-.12.57.16.28.72 1.18 1.54 1.91 1.06.94 1.95 1.23 2.23 1.37.28.14.44.12.6-.07.17-.19.7-.81.88-1.09.19-.28.37-.23.62-.14.25.09 1.6.75 1.87.89.28.14.46.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
+    <span>WhatsApp</span>
+  </a>
+
+  <button class="nav-burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</header>
+
+<main id="main">
+
+<!-- ==================================================================== -->
+<!-- ABA 1 — INÍCIO                                                        -->
+<!-- ==================================================================== -->
+<section class="view" id="view-inicio">
+
+  <div class="stage" id="stage">
+    <canvas id="smoke" aria-hidden="true"></canvas>
+
+    <div class="hero" id="hero">
+      <div class="hero-sky" id="heroSky"></div>
+
+      <div class="hero-sun" id="heroSun" aria-hidden="true">
+        <svg viewBox="0 0 400 400"><g id="sunRays"></g><circle cx="200" cy="200" r="94" /></svg>
+      </div>
+
+      <!-- duas versões do horizonte: a larga para desktop e uma compacta para
+           telas estreitas, onde a larga ficaria espremida -->
+      <div class="hero-sea" id="heroSea" aria-hidden="true">
+        <svg id="seaSvg" viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax meet">
+          <g class="sea-wide">
+            <!-- Morro Dois Irmãos -->
+            <path class="morro" d="M-60 260
+              C 30 244 100 206 148 96 C 168 60 190 32 214 24
+              C 240 34 266 74 290 120 C 304 146 314 162 324 170
+              C 340 150 356 116 378 94 C 396 76 412 64 428 60
+              C 452 74 476 122 502 162 C 546 206 612 242 690 260 Z" />
+
+            <!-- Morro da Urca + Pão de Açúcar -->
+            <path class="morro morro-2" d="M890 260
+              C 962 238 1030 186 1092 128 C 1110 112 1130 102 1152 102
+              C 1174 106 1190 122 1204 142 C 1214 156 1222 164 1230 168
+              C 1238 140 1252 96 1280 72 C 1300 56 1320 50 1340 52
+              C 1366 58 1386 96 1404 142 C 1424 188 1452 228 1500 260 Z" />
+
+            <!-- faixa do mar -->
+            <path class="agua" d="M0 260 L1440 260 L1440 214 C 1200 200 1080 232 900 224 C 700 214 560 240 380 230 C 220 222 110 236 0 226 Z" />
+          </g>
+
+          <g class="sea-narrow">
+            <!-- Dois Irmãos compacto -->
+            <path class="morro" d="M-40 300
+              C 10 286 44 250 74 178 C 88 142 104 112 122 104
+              C 142 112 158 142 174 178 C 184 200 192 214 198 220
+              C 208 200 220 174 236 156 C 248 142 260 134 272 132
+              C 288 140 304 172 320 210 C 336 246 356 282 386 300 Z" />
+
+            <!-- Urca + Pão de Açúcar compactos -->
+            <path class="morro morro-2" d="M392 300
+              C 436 284 468 254 496 220 C 508 206 522 198 538 198
+              C 554 200 566 210 576 224 C 584 234 590 240 596 244
+              C 602 222 612 186 634 168 C 648 156 664 152 680 154
+              C 700 160 716 190 730 224 C 742 252 758 284 800 300 Z" />
+
+            <path class="agua" d="M-40 300 L800 300 L800 256 C 660 248 580 268 460 262 C 340 256 250 274 140 266 C 60 260 10 270 -40 264 Z" />
+          </g>
+        </svg>
+      </div>
+
+      <div class="hero-copy" id="heroCopy">
+        <div class="hc-top">
+          <p class="kicker">Rio de Janeiro · entrega no mesmo dia</p>
+          <h1 class="hero-title" id="heroTitle">O pôr do sol<br><span>cabe no bolso</span></h1>
+        </div>
+        <p class="hero-sub" id="heroSub">Pods e vapes selecionados, preço de amigo e aquela vibe de fim de tarde na praia.</p>
+      </div>
+
+
+      <div class="pod-wrap" id="podWrap" aria-hidden="true">
+        <img class="pod-photo" id="podPhoto" src="assets/products/pod-generico.jpg" alt="" />
+      </div>
+
+      <div class="scroll-cue" id="scrollCue">
+        <span>role para baixo</span>
+        <svg viewBox="0 0 24 40"><rect x="1" y="1" width="22" height="38" rx="11"/><circle cx="12" cy="12" r="3.4"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSÃO 2 — nasce da fumaça -->
+  <section class="showcase" id="showcase">
+    <div class="showcase-inner">
+      <p class="kicker kicker-light" id="showcaseKicker">A fumaça baixou. A promoção apareceu.</p>
+      <h2 class="showcase-title">Tá rolando<br><span>promoção</span></h2>
+      <a class="btn-big" href="#/pods">
+        <span>Conferir loja</span>
+        <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+
+      <div class="promo-carousel" id="promoCarousel">
+        <button class="car-arrow car-prev" id="carPrev" aria-label="Anterior">&#8249;</button>
+        <div class="car-viewport" id="carViewport"><div class="car-track" id="carTrack"></div></div>
+        <button class="car-arrow car-next" id="carNext" aria-label="Próximo">&#8250;</button>
+        <div class="car-dots" id="carDots"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-track" id="tickerTrack"></div></div>
+
+  <section class="perks">
+    <div class="perk">
+      <div class="perk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.6 12 3l9 4.6v8.8L12 21l-9-4.6z"/><path d="M3 7.6 12 12.2l9-4.6M12 12.2V21"/></svg></div>
+      <h3>Entrega no Rio</h3><p>Zona Sul e Barra no mesmo dia. Combinamos tudo pelo Zap.</p>
+    </div>
+    <div class="perk">
+      <div class="perk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 14.3 4.6l2.9-.2.9 2.8 2.4 1.7-1.1 2.7 1.1 2.7-2.4 1.7-.9 2.8-2.9-.2L12 21.2 9.7 19.4l-2.9.2-.9-2.8-2.4-1.7 1.1-2.7-1.1-2.7 2.4-1.7.9-2.8 2.9.2z"/><path d="M8.9 12.1 11 14.3l4.1-4.4"/></svg></div>
+      <h3>Só original</h3><p>Marcas conferidas uma a uma. Nada de pod duvidoso.</p>
+    </div>
+    <div class="perk">
+      <div class="perk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.6a8 8 0 0 1-8 8H7.6L3 22.4l1.4-4.8A8 8 0 1 1 21 11.6z"/><path d="M8.6 11.4h6.8M8.6 8.2h4.6"/></svg></div>
+      <h3>Atendimento humano</h3><p>Dúvida de sabor ou puff? Chama que a gente indica.</p>
+    </div>
+    <div class="perk">
+      <div class="perk-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 12.7 12.7 20.6a1.6 1.6 0 0 1-2.3 0L3.4 13.6V3.4h10.2l7 7a1.6 1.6 0 0 1 0 2.3z"/><circle cx="8.4" cy="8.4" r="1.5"/></svg></div>
+      <h3>Preço de amigo</h3><p>Pix, cartão e combo pra quem leva mais de um.</p>
+    </div>
+  </section>
+
+  <section class="cta-final">
+    <h2>Escolheu o seu?</h2>
+    <p>Manda o nome do pod no WhatsApp que a gente resolve rapidinho.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary btn-lg" href="#/pods">Ver todos os pods</a>
+      <a class="btn btn-zap btn-lg js-zap" href="#">Chamar no WhatsApp</a>
+    </div>
+  </section>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ABA 2 — PODS                                                          -->
+<!-- ==================================================================== -->
+<section class="view" id="view-pods" hidden>
+  <div class="shop-head">
+    <h1>A loja</h1>
+    <p id="shopNotice">Escolhe o teu, chama no Zap e recebe hoje.</p>
+  </div>
+
+  <div class="filters" id="filters">
+    <div class="filter-bar">
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <input type="search" id="search" placeholder="Buscar por nome, marca, sabor ou tag…" autocomplete="off" />
+          <button class="search-clear" id="searchClear" hidden aria-label="Limpar">&times;</button>
+        </div>
+        <button class="filters-toggle" id="toggleFilters" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M6 12h12M10 18h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <span>Filtros</span><b class="fcount" id="fcount" hidden>0</b>
+        </button>
+        <select id="sortBy" class="sort-select" aria-label="Ordenar">
+          <option value="destaque">Ordenar: destaque</option>
+          <option value="menor">Menor preço</option>
+          <option value="maior">Maior preço</option>
+          <option value="az">Nome (A-Z)</option>
+          <option value="puffs">Mais puffs</option>
+        </select>
+      </div>
+      <div class="active-filters" id="activeFilters" hidden></div>
+    </div>
+    <div class="chips-panel" id="chipsPanel" hidden>
+      <div class="chips-groups" id="chipGroups"></div>
+    </div>
+  </div>
+
+  <div id="shopSections">
+    <section class="row-block" id="blockBest">
+      <div class="row-head"><h2>Os mais vendidos</h2><span class="row-line"></span></div>
+      <div class="rail" id="railBest"></div>
+    </section>
+
+    <section class="row-block" id="blockPromo">
+      <div class="row-head"><h2>Promoções</h2><span class="row-line"></span></div>
+      <div class="rail" id="railPromo"></div>
+    </section>
+
+    <section class="row-block">
+      <div class="row-head"><h2 id="gridTitle">Todos os produtos</h2><span class="row-line"></span><span class="count" id="gridCount"></span></div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="emptyState" hidden>
+        <p>Nada encontrado por aqui.</p>
+        <button class="btn btn-ghost" id="clearAll">Limpar filtros</button>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ==================================================================== -->
+<!-- ABA 3 — ADM                                                           -->
+<!-- ==================================================================== -->
+<section class="view view-adm" id="view-adm" hidden>
+  <div class="adm-login" id="admLogin">
+    <form class="adm-login-card" id="admLoginForm">
+      <img src="assets/logo-sunset.png" alt="" />
+      <h2>Painel do administrador</h2>
+      <input type="password" id="admPass" placeholder="Senha" autocomplete="current-password" />
+      <button class="btn btn-primary" type="submit">Entrar</button>
+      <p class="hint">Senha padrão: <code>sunset</code> — troque em Configurações.</p>
+    </form>
+  </div>
+
+  <div class="adm-panel" id="admPanel" hidden>
+    <div class="adm-top">
+      <div>
+        <h1>Painel</h1>
+        <p class="adm-sub">Gestão da vitrine Sunset Pod</p>
+      </div>
+      <div class="adm-top-actions">
+        <button class="btn btn-ghost" id="btnExport">Exportar dados</button>
+        <button class="btn btn-ghost" id="btnImport">Importar</button>
+        <input type="file" id="fileImport" accept=".js,.json,application/json,text/javascript" hidden />
+        <button class="btn btn-ghost" id="btnLogout">Sair</button>
+      </div>
+    </div>
+
+    <div class="adm-stats" id="admStats"></div>
+
+    <div class="adm-tabs" role="tablist">
+      <button class="atab is-on" data-atab="produtos">Produtos</button>
+      <button class="atab" data-atab="sessoes">Sessões</button>
+      <button class="atab" data-atab="config">Configurações</button>
+      <button class="atab" data-atab="ajuda">Publicar</button>
+    </div>
+
+    <!-- PRODUTOS -->
+    <div class="apane is-on" id="apane-produtos">
+      <div class="apane-head">
+        <div class="search-box small">
+          <input type="search" id="admSearch" placeholder="Filtrar produtos…" />
+        </div>
+        <button class="btn btn-primary" id="btnNew">+ Novo produto</button>
+      </div>
+      <div class="table-wrap"><table class="adm-table"><thead><tr>
+        <th></th><th>Produto</th><th>Marca</th><th>Puffs</th><th>Preço</th><th>Promo</th><th>Estoque</th><th>Sessões</th><th></th>
+      </tr></thead><tbody id="admTbody"></tbody></table></div>
+    </div>
+
+    <!-- SESSÕES -->
+    <div class="apane" id="apane-sessoes">
+      <div class="sess-grid">
+        <div class="sess-col">
+          <h3>Os mais vendidos</h3>
+          <p class="muted">Arraste para ordenar. Aparece na primeira linha da aba Pods.</p>
+          <ul class="sortable" id="listBest"></ul>
+        </div>
+        <div class="sess-col">
+          <h3>Promoções — carrossel do início</h3>
+          <p class="muted">Produtos marcados como promoção. Arraste para ordenar.</p>
+          <ul class="sortable" id="listPromo"></ul>
+        </div>
+      </div>
+      <div class="sess-add">
+        <h3>Adicionar / remover das sessões</h3>
+        <div class="sess-toggles" id="sessToggles"></div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div class="apane" id="apane-config">
+      <form class="cfg-form" id="cfgForm">
+        <fieldset><legend>Contato</legend>
+          <label>Número do WhatsApp <small>(com DDI e DDD, só números)</small>
+            <input name="whatsapp" placeholder="5521999999999" /></label>
+          <label>Mensagem padrão do pedido <small>use {produto} e {preco}</small>
+            <textarea name="msgTemplate" rows="3"></textarea></label>
+          <label>Instagram <input name="instagram" placeholder="@sunsetpod" /></label>
+        </fieldset>
+        <fieldset><legend>Textos do início</legend>
+          <label>Título da hero <input name="heroTitle" /></label>
+          <label>Destaque do título <input name="heroTitleHl" /></label>
+          <label>Subtítulo <input name="heroSub" /></label>
+          <label>Chamada da sessão 2 <input name="showcaseKicker" /></label>
+          <label>Frases da faixa animada <small>separadas por vírgula</small>
+            <input name="tickerItems" /></label>
+        </fieldset>
+        <fieldset><legend>Loja</legend>
+          <label class="row-check"><input type="checkbox" name="storeOpen" /> <span>Loja aberta (mostra botões de pedido)</span></label>
+          <label>Aviso do topo da loja <input name="shopNotice" /></label>
+          <label>Nova senha do painel <input name="newPass" type="password" placeholder="deixe vazio para manter" /></label>
+        </fieldset>
+        <div class="cfg-actions"><button class="btn btn-primary" type="submit">Salvar configurações</button></div>
+      </form>
+    </div>
+
+    <!-- PUBLICAR -->
+    <div class="apane" id="apane-ajuda">
+      <div class="help">
+        <h3>Como as alterações são salvas</h3>
+        <p>Tudo o que você edita aqui fica guardado <b>neste navegador</b> (localStorage). Isso deixa o painel instantâneo e sem custo de servidor — mas as mudanças ainda não aparecem para os clientes.</p>
+        <h3>Como publicar para todo mundo</h3>
+        <ol>
+          <li>Clique em <b>Exportar dados</b> — baixa o arquivo <code>seed.js</code>.</li>
+          <li>Substitua o arquivo <code>data/seed.js</code> do site por esse arquivo.</li>
+          <li>Suba a pasta para a hospedagem (Netlify, Vercel, GitHub Pages…).</li>
+        </ol>
+        <p class="muted">O campo <code>version</code> é incrementado a cada exportação: quando o visitante abre o site com uma versão maior que a guardada, os dados novos entram automaticamente. Versão atual destes dados: <b id="versaoAtual">—</b>.</p>
+        <h3>Zona de perigo</h3>
+        <div class="danger-row">
+          <button class="btn btn-ghost" id="btnReseed">Restaurar catálogo inicial</button>
+          <button class="btn btn-danger" id="btnWipe">Apagar tudo deste navegador</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-brand">
+      <img src="assets/logo-sunset.png" alt="Sunset Pod" />
+      <p>Pods, vapes e sabores com energia carioca.<br>Do Arpoador pra sua mão.</p>
+    </div>
+    <div class="foot-links">
+      <h4>Navegar</h4>
+      <a href="#/inicio">Início</a><a href="#/pods">Pods</a><a href="#/adm">Área do adm</a>
+    </div>
+    <div class="foot-links">
+      <h4>Fala com a gente</h4>
+      <a class="js-zap" href="#">WhatsApp</a>
+      <a id="footInsta" href="#" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+  <div class="foot-legal">
+    <p><b>Venda proibida para menores de 18 anos.</b> Produto contém nicotina, substância que causa dependência. Não recomendado para não fumantes, gestantes e lactantes.</p>
+    <p>© <span id="year"></span> Sunset Pod · Rio de Janeiro</p>
+  </div>
+</footer>
+
+<a class="fab-zap js-zap" href="#" aria-label="Chamar no WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12.04 2A9.9 9.9 0 0 0 2.1 11.9c0 1.75.46 3.45 1.32 4.95L2 22l5.3-1.38a9.9 9.9 0 0 0 4.74 1.2h.01a9.9 9.9 0 0 0 9.9-9.9A9.9 9.9 0 0 0 12.04 2Zm5.8 14.05c-.24.68-1.42 1.3-1.96 1.34-.5.05-.98.23-3.32-.69-2.8-1.1-4.57-3.96-4.71-4.15-.14-.19-1.13-1.5-1.13-2.86 0-1.36.71-2.03.96-2.31.25-.28.55-.35.73-.35h.52c.17 0 .4-.06.62.47.24.57.8 1.98.87 2.12.07.14.12.3.02.49-.09.19-.14.3-.28.47l-.42.48c-.14.14-.28.29-.12.57.16.28.72 1.18 1.54 1.91 1.06.94 1.95 1.23 2.23 1.37.28.14.44.12.6-.07.17-.19.7-.81.88-1.09.19-.28.37-.23.62-.14.25.09 1.6.75 1.87.89.28.14.46.21.53.33.07.12.07.68-.17 1.36Z"/></svg>
+</a>
+
+<div id="modalRoot"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script src="data/seed.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/hero.js"></script>
+<script src="js/shop.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -731,6 +731,8 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
   /* pod e sol no mesmo centro, abaixados pra não encostar no título */
   .pod-wrap{ width:min(102vw,430px); top:57%; }
   .hero-sun{ width:min(98vw,415px); top:57%; }
+  /* sol parado no celular: girando, ele fazia o fundo inteiro parecer balançar */
+  .hero-sun #sunRays{ animation:none; }
 
   /* só o ícone: a legenda encostava no subtítulo */
   .scroll-cue{ bottom:8px; gap:0; }

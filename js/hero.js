@@ -94,6 +94,22 @@
       }
     }
 
+    // Devolve o brilho quente que o multiply dava: ali o branco do aparelho
+    // pegava a cor do sol atrás. Agora esse laranja é pintado na própria
+    // imagem, então o visual é o mesmo sem depender do fundo.
+    var SOL = [235, 95, 30];
+    for (var n = 0; n < W * H; n++) {
+      var o = n * 4;
+      if (px[o + 3] !== 255) continue;                 // borda suavizada fica como está
+      var l = 0.299 * px[o] + 0.587 * px[o + 1] + 0.114 * px[o + 2];
+      if (l <= 120) continue;                          // corpo escuro do aparelho não muda
+      var t = Math.min(1, (l - 120) / 90);             // quanto mais claro, mais laranja
+      var f = l / 255;                                 // multiply: branco vira o sol cheio
+      px[o]     = Math.round(px[o]     + (SOL[0] * f - px[o])     * t);
+      px[o + 1] = Math.round(px[o + 1] + (SOL[1] * f - px[o + 1]) * t);
+      px[o + 2] = Math.round(px[o + 2] + (SOL[2] * f - px[o + 2]) * t);
+    }
+
     cx.putImageData(dados, 0, 0);
     return cv.toDataURL('image/png');
   }

@@ -203,6 +203,9 @@ body.nav-dark .nav-burger span{ background:var(--areia-2); }
   opacity:0; transition:opacity .35s var(--ease);
   animation:flutua 6s ease-in-out infinite;   /* o pod boia de leve */
 }
+/* camada revelada pelo rastro do mouse — empilhada sobre a da frente */
+.pod-photo--reveal{ position:absolute; inset:0; }
+
 @keyframes flutua{
   0%,100%{ transform:translateY(-1.6%) rotate(-1.3deg); }
   50%{     transform:translateY(1.8%)  rotate(1.3deg); }

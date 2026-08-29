@@ -42,15 +42,17 @@
     if (!el) return;
     var origem = new Image();
     origem.onload = function () {
-      var url = semFundo(origem);
+      var url = semFundo(origem, true);
       if (url) el.src = url;
       el.style.opacity = '1';
+      // a versão sem o tom do sol serve de camada revelada pelo rastro
+      trilhaMorph(el, semFundo(origem, false));
     };
     origem.onerror = function () { el.style.opacity = '1'; };
     origem.src = el.getAttribute('src');
   }
 
-  function semFundo(img) {
+  function semFundo(img, tingir) {
     var W = img.naturalWidth, H = img.naturalHeight;
     if (!W || !H) return null;
     var cv = document.createElement('canvas');
@@ -105,16 +107,147 @@
     // só que aplicada de uma vez na imagem. O aparelho inteiro pega o tom
     // quente, o branco de dentro vira laranja e o corpo escuro segue escuro.
     var SOL = [235, 95, 30];
-    for (var n = 0; n < W * H; n++) {
-      var o = n * 4;
-      if (px[o + 3] === 0) continue;
-      px[o]     = (px[o]     * SOL[0]) / 255;
-      px[o + 1] = (px[o + 1] * SOL[1]) / 255;
-      px[o + 2] = (px[o + 2] * SOL[2]) / 255;
+    if (tingir) {
+      for (var n = 0; n < W * H; n++) {
+        var o = n * 4;
+        if (px[o + 3] === 0) continue;
+        px[o]     = (px[o]     * SOL[0]) / 255;
+        px[o + 1] = (px[o + 1] * SOL[1]) / 255;
+        px[o + 2] = (px[o + 2] * SOL[2]) / 255;
+      }
     }
 
     cx.putImageData(dados, 0, 0);
     return cv.toDataURL('image/png');
+  }
+
+  /* ================= rastro que revela o pod (só desktop) =================
+     Passar o mouse abre um rastro de bolhas orgânicas que perfura o pod
+     tingido de pôr do sol e mostra, no mesmo formato, a cor natural dele.
+     Constantes e matemática das bolhas conforme o efeito de referência.   */
+  var PONTOS_MAX = 60, CABECA_R = 140, RUIDO = 44,
+      LADOS = 24, ESVAI = 0.92, PASSO_AMOSTRA = 8;
+
+  function trilhaMorph(frente, urlRevelada) {
+    if (!urlRevelada || reduced) return;
+    // apenas em telas grandes com mouse de verdade
+    var ok = global.matchMedia &&
+      matchMedia('(min-width: 761px) and (hover: hover) and (pointer: fine)').matches;
+    if (!ok) return;
+
+    var palco = $('.hero'), berco = frente.parentNode;
+    if (!palco || !berco) return;
+
+    var revelada = new Image();
+    revelada.className = frente.className + ' pod-photo--reveal';
+    revelada.alt = '';
+    revelada.setAttribute('aria-hidden', 'true');
+    revelada.src = urlRevelada;
+    berco.appendChild(revelada);
+
+    var cvFrente = document.createElement('canvas');
+    var cvRevela = document.createElement('canvas');
+    var ctxF = cvFrente.getContext('2d'), ctxR = cvRevela.getContext('2d');
+
+    var pontos = [], raio = 0, sobre = false, tempo = 0;
+    var mx = 0, my = 0, ultX = null, ultY = null, quadro = null;
+
+    function medir() {
+      var r = berco.getBoundingClientRect();
+      var l = Math.max(1, Math.round(Math.min(r.width, 640)));
+      if (cvFrente.width !== l) { cvFrente.width = cvFrente.height = l; cvRevela.width = cvRevela.height = l; }
+      return r;
+    }
+
+    // bolha organica: 24 pontos com tres senoides somadas, fechada em curvas
+    function bolha(ctx, cx, cy, r, t, semente) {
+      if (r < 2) return;
+      var pts = [], i, a, n1, n2, n3, ruido, raioP;
+      for (i = 0; i < LADOS; i++) {
+        a = (i / LADOS) * Math.PI * 2;
+        n1 = Math.sin(a * 3 + t * 1.4 + semente) * 0.45;
+        n2 = Math.sin(a * 5 - t * 0.9 + semente * 2.3) * 0.3;
+        n3 = Math.cos(a * 2 + t * 1.8 + semente * 0.7) * 0.25;
+        ruido = (n1 + n2 + n3) * RUIDO * (r / CABECA_R);
+        raioP = r + ruido;
+        pts.push([cx + Math.cos(a) * raioP, cy + Math.sin(a) * raioP]);
+      }
+      ctx.beginPath();
+      var mX = (pts[LADOS - 1][0] + pts[0][0]) / 2, mY = (pts[LADOS - 1][1] + pts[0][1]) / 2;
+      ctx.moveTo(mX, mY);
+      for (i = 0; i < LADOS; i++) {
+        var p = pts[i], q = pts[(i + 1) % LADOS];
+        ctx.quadraticCurveTo(p[0], p[1], (p[0] + q[0]) / 2, (p[1] + q[1]) / 2);
+      }
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function desenhar(ctx, inverter) {
+      var l = ctx.canvas.width;
+      ctx.clearRect(0, 0, l, l);
+      if (!inverter) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, l, l); }
+      ctx.globalCompositeOperation = inverter ? 'source-over' : 'destination-out';
+      ctx.fillStyle = '#fff';
+      for (var i = 0; i < pontos.length; i++) {
+        var p = pontos[i];
+        ctx.globalAlpha = p.alpha;
+        bolha(ctx, p.x, p.y, p.r, tempo, p.seed);
+      }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function aplicar(el, ctx) {
+      var u = 'url(' + ctx.canvas.toDataURL() + ')';
+      el.style.webkitMaskImage = u; el.style.maskImage = u;
+      el.style.webkitMaskSize = '100% 100%'; el.style.maskSize = '100% 100%';
+      el.style.webkitMaskRepeat = 'no-repeat'; el.style.maskRepeat = 'no-repeat';
+    }
+
+    function limpar() {
+      frente.style.webkitMaskImage = frente.style.maskImage = '';
+      revelada.style.webkitMaskImage = revelada.style.maskImage = 'linear-gradient(#0000,#0000)';
+    }
+
+    function passo() {
+      var r = medir();
+      var escala = cvFrente.width / (r.width || 1);
+      var alvo = sobre ? CABECA_R : 0;
+      raio += (alvo - raio) * (sobre ? 0.14 : 0.04);
+
+      if (sobre && raio > 5) {
+        var cx = (mx - r.left) * escala, cy = (my - r.top) * escala;
+        if (ultX === null || Math.hypot(cx - ultX, cy - ultY) > PASSO_AMOSTRA) {
+          pontos.push({ x: cx, y: cy, r: raio, alpha: 1, seed: Math.random() * 100 });
+          if (pontos.length > PONTOS_MAX) pontos.shift();
+          ultX = cx; ultY = cy;
+        }
+      }
+
+      for (var i = pontos.length - 1; i >= 0; i--) {
+        pontos[i].alpha *= ESVAI;
+        pontos[i].r *= 0.995;
+        if (pontos[i].alpha < 0.01) pontos.splice(i, 1);
+      }
+      tempo += 0.016;
+
+      if (!pontos.length && raio < 1) { limpar(); quadro = null; return; }
+
+      desenhar(ctxF, false);
+      desenhar(ctxR, true);
+      aplicar(frente, ctxF);
+      aplicar(revelada, ctxR);
+      quadro = requestAnimationFrame(passo);
+    }
+
+    function acordar() { if (!quadro) quadro = requestAnimationFrame(passo); }
+
+    palco.addEventListener('mousemove', function (e) { mx = e.clientX; my = e.clientY; sobre = true; acordar(); });
+    palco.addEventListener('mouseenter', function (e) { mx = e.clientX; my = e.clientY; sobre = true; acordar(); });
+    palco.addEventListener('mouseleave', function () { sobre = false; ultX = ultY = null; acordar(); });
+
+    limpar();
   }
 
   /* ================= barra do topo ================= */

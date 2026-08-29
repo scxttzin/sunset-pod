@@ -142,6 +142,9 @@
     revelada.className = frente.className + ' pod-photo--reveal';
     revelada.alt = '';
     revelada.setAttribute('aria-hidden', 'true');
+    // .pod-photo nasce com opacity:0 (fade do recorte); sem isso a camada
+    // revelada fica invisivel e o rastro só abre buracos no pod
+    revelada.style.opacity = '1';
     revelada.src = urlRevelada;
     berco.appendChild(revelada);
 

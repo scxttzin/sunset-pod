@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sunset Pod — Reels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --areia:#F0DCB8; --areia-2:#F7EAD2; --creme:#FDF6E9; --areia-d:#E4C99C;
+    --laranja:#E24A12; --laranja-2:#FF7A2F; --laranja-3:#FFA24D;
+    --marrom:#2E2019; --marrom-3:#7A5540; --noite:#1B120D;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; min-height:100vh; background:var(--noite); color:var(--creme);
+    font-family:"Outfit", ui-sans-serif, system-ui, sans-serif;
+    display:flex; flex-direction:column; align-items:center; gap:18px; padding:22px 14px 40px;
+  }
+  h1{ font-family:"Lilita One", Impact, sans-serif; font-weight:400; font-size:1.4rem; margin:0; letter-spacing:.5px; }
+  h1 span{ color:var(--laranja-2); }
+  .stage{
+    width:min(360px,92vw); aspect-ratio:9/16; border-radius:18px; overflow:hidden;
+    box-shadow:0 28px 60px -24px rgba(0,0,0,.8); background:var(--laranja);
+  }
+  canvas{ width:100%; height:100%; display:block; }
+  .bar{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  button{
+    font:inherit; font-weight:700; cursor:pointer; border:2px solid transparent;
+    border-radius:999px; padding:11px 20px; background:var(--laranja); color:var(--creme);
+    transition:transform .16s cubic-bezier(.22,.8,.28,1), background .16s;
+  }
+  button:hover{ transform:translateY(-2px); }
+  button.ghost{ background:transparent; border-color:var(--marrom-3); color:var(--areia); }
+  button[disabled]{ opacity:.5; cursor:default; transform:none; }
+  .hint{ color:var(--marrom-3); font-size:.82rem; max-width:430px; text-align:center; line-height:1.5; }
+  .hint b{ color:var(--areia-d); }
+  #status{ font-size:.82rem; color:var(--laranja-3); min-height:1.2em; }
+</style>
+</head>
+<body>
+  <h1>Sunset Pod — <span>Reels 9:16</span></h1>
+  <div class="stage"><canvas id="c" width="720" height="1280"></canvas></div>
+  <div class="bar">
+    <button id="play">▶ Reproduzir</button>
+    <button id="rec" class="ghost">⏺ Gravar .mp4</button>
+  </div>
+  <div id="status"></div>
+  <p class="hint">
+    9,4 s · 720×1280 · paleta Sunset invertida (laranja, creme, marrom).
+    O botão <b>Gravar</b> roda a animação uma vez e baixa o arquivo <b>sunset-reels.mp4</b>.
+  </p>
+
+<script>
+(function(){
+  'use strict';
+
+  var W = 720, H = 1280;
+  var cv = document.getElementById('c');
+  var ctx = cv.getContext('2d', { alpha:false });
+
+  /* ---------------- paleta Sunset ---------------- */
+  var C = {
+    areia:'#F0DCB8', areia2:'#F7EAD2', areiaD:'#E4C99C', creme:'#FDF6E9',
+    laranja:'#E24A12', laranja2:'#FF7A2F', laranja3:'#FFA24D', brasa:'#B93A0C',
+    marrom:'#2E2019', noite:'#1B120D'
+  };
+
+  var logo = new Image();
+  var logoBg = null;   // cor do fundo da própria arte da logo, para o card final casar
+  var spSol = null;    // sprite só do sol (laranja), com alfa
+  var spLetra = null;  // sprite só da parte escura: "Sunset", "pod", montanhas, onda
+  var LOGO_N = 0;      // lado da arte em px
+  logo.src = '../assets/logo-sunset.png';
+
+  /* Medidas da arte (px, em cima do PNG 1254×1254) */
+  var L = {
+    solCx: 635, solCy: 420,     // centro do sol
+    letraY0: 644, letraY1: 838, // faixa do letreiro "Sunset"
+    podY0: 838,  podY1: 1010    // faixa do "pod" + montanhas
+  };
+
+  /* Separa a arte em duas camadas com transparência, para o sol poder
+     girar e escalar sem arrastar um retângulo de fundo junto.          */
+  function buildSprites(){
+    var n = logo.naturalWidth;
+    LOGO_N = n;
+    var src = document.createElement('canvas'); src.width = src.height = n;
+    var sx = src.getContext('2d', { willReadFrequently:true });
+    sx.drawImage(logo, 0, 0);
+    var img = sx.getImageData(0, 0, n, n), d = img.data;
+    var br = d[0], bgc = d[1], bb = d[2];
+    logoBg = 'rgb(' + br + ',' + bgc + ',' + bb + ')';
+
+    var a = new ImageData(n, n), b = new ImageData(n, n);
+    for (var i = 0; i < d.length; i += 4){
+      var r = d[i], g = d[i+1], bl = d[i+2];
+      var diff = Math.abs(r-br) + Math.abs(g-bgc) + Math.abs(bl-bb);
+      if (diff <= 20) continue;
+      var al = diff >= 80 ? 255 : Math.round((diff - 20) / 60 * 255);
+      var t = (r > 150 && g < 125 && bl < 100) ? a : b;   // laranja → sol
+      t.data[i] = r; t.data[i+1] = g; t.data[i+2] = bl; t.data[i+3] = al;
+    }
+    spSol   = document.createElement('canvas'); spSol.width   = spSol.height   = n;
+    spLetra = document.createElement('canvas'); spLetra.width = spLetra.height = n;
+    spSol.getContext('2d').putImageData(a, 0, 0);
+    spLetra.getContext('2d').putImageData(b, 0, 0);
+  }
+
+  /* Desenha um sprite em coordenadas da arte, com pivô, rotação e escala.
+     ox,oy,k = origem e fator de escala da arte dentro do quadro.        */
+  function sprite(sp, ox, oy, k, pivX, pivY, opt){
+    if (!sp || opt.alpha <= .004) return;
+    ctx.save();
+    if (opt.clip){
+      ctx.beginPath();
+      ctx.rect(opt.clip[0], opt.clip[1], opt.clip[2], opt.clip[3]);
+      ctx.clip();
+    }
+    ctx.globalAlpha = opt.alpha > 1 ? 1 : opt.alpha;
+    ctx.translate(ox + pivX * k + (opt.dx || 0), oy + pivY * k + (opt.dy || 0));
+    if (opt.rot) ctx.rotate(opt.rot);
+    if (opt.scale && opt.scale !== 1) ctx.scale(opt.scale, opt.scale);
+    ctx.drawImage(sp, -pivX * k, -pivY * k, LOGO_N * k, LOGO_N * k);
+    ctx.restore();
+  }
+
+  /* ---------------- utilidades ---------------- */
+  function ease(t){ return 1 - Math.pow(1 - t, 3); }          // saída suave
+  function easeIO(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+  function backOut(t){ var c = 1.42; return 1 + (c+1)*Math.pow(t-1,3) + c*Math.pow(t-1,2); }
+  function clamp(v,a,b){ return v < a ? a : (v > b ? b : v); }
+  function lerp(a,b,k){ return a + (b-a)*k; }
+  function setFont(px){ ctx.font = '400 ' + px + 'px "Lilita One", Impact, sans-serif'; }
+
+  // maior corpo que cabe em maxW — memoizado, senão são ~8 measureText por linha por frame
+  var fitCache = Object.create(null);
+  function fit(text, maxW, cap){
+    var key = text + '|' + maxW + '|' + cap;
+    var hit = fitCache[key];
+    if (hit !== undefined){ setFont(hit); return hit; }
+    var lo = 10, hi = cap || 300, mid;
+    while (hi - lo > 1){
+      mid = (lo + hi) >> 1;
+      setFont(mid);
+      if (ctx.measureText(text).width <= maxW) lo = mid; else hi = mid;
+    }
+    setFont(lo);
+    fitCache[key] = lo;
+    return lo;
+  }
+
+  function word(text, cx, cy, size, color, alpha, scale){
+    if (alpha <= .004) return;
+    ctx.save();
+    ctx.globalAlpha = alpha > 1 ? 1 : alpha;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.translate(cx, cy);
+    if (scale && scale !== 1) ctx.scale(scale, scale);
+    setFont(size);
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  }
+
+  function bg(color){ ctx.fillStyle = color; ctx.fillRect(0,0,W,H); }
+
+  // textura de papel, igual ao .grain do site — pattern criado uma única vez
+  var grainPat = (function(){
+    var g = document.createElement('canvas'); g.width = g.height = 160;
+    var gx = g.getContext('2d'), d = gx.createImageData(160,160), i, v;
+    for (i = 0; i < d.data.length; i += 4){
+      v = 120 + Math.random() * 135;
+      d.data[i] = d.data[i+1] = d.data[i+2] = v; d.data[i+3] = 16;
+    }
+    gx.putImageData(d, 0, 0);
+    return ctx.createPattern(g, 'repeat');
+  })();
+  function grainPass(){
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = .45;
+    ctx.fillStyle = grainPat;
+    ctx.fillRect(0,0,W,H);
+    ctx.restore();
+  }
+
+  /* ------------- pilha de palavras (eco vertical) -------------
+     Tudo aqui é contínuo: a altura do grupo cresce em float, cada
+     linha nasce com fade + escala, e a alternância sólido/fantasma
+     é um crossfade em vez de um liga-desliga por frame.            */
+  function stack(o){
+    var t = o.t;
+    if (t < 0) return;
+    var beat = o.beat, n = o.n, lineH = o.lineH;
+    var prog   = t / beat;
+    var step   = Math.floor(prog);
+    var local  = prog - step;
+    var vf     = Math.min(prog + 1, n);              // linhas visíveis (float)
+    var active = step % n;
+    var prev   = (step - 1 + n) % n;
+    var mix    = easeIO(clamp(local / .30, 0, 1));   // crossfade da batida
+    var count  = Math.min(Math.ceil(vf), n);
+    var ghostA = o.ghostAlpha == null ? .17 : o.ghostAlpha;
+
+    // o grupo respira e desliza junto enquanto cresce
+    var breathe = 1 + .008 * Math.sin(t * 5.2);
+    var top = H/2 - (vf * lineH) / 2 + lineH/2;
+
+    for (var i = 0; i < count; i++){
+      var born = i * beat;
+      var life = clamp((t - born) / (beat * .8), 0, 1);
+      if (life <= 0) continue;
+      var fadeIn = ease(life);
+      var sc = (1 + .30 * (1 - fadeIn)) * breathe;
+      var y  = top + i * lineH + (1 - fadeIn) * lineH * .22;
+
+      var wNow  = ((active - i) % 2 + 2) % 2 === 0 ? 1 : 0;
+      var wPrev = ((prev   - i) % 2 + 2) % 2 === 0 ? 1 : 0;
+      // durante a construção a linha recém-nascida entra sempre sólida
+      if (step < n && i === step) wPrev = 1;
+      var solidW = lerp(wPrev, wNow, mix);
+
+      word(o.text, W/2, y, o.size, o.ghostColor, ghostA * (1 - solidW) * fadeIn, sc);
+      word(o.text, W/2, y, o.size, o.solid,               solidW  * fadeIn, sc);
+    }
+  }
+
+  /* ------------- palavra única com pop e deriva contínua ------------- */
+  function beatWord(text, t, dur, size, color, cy){
+    var inK  = ease(clamp(t / .20, 0, 1));
+    var outK = ease(clamp((t - (dur - .12)) / .12, 0, 1));
+    var sc   = (1 + .22 * (1 - inK)) * (1 - .07 * outK) * (1 + .012 * Math.sin(t * 7.5));
+    var y    = (cy == null ? H/2 : cy) + (1 - inK) * 26 - outK * 14;
+    word(text, W/2, y, size, color, inK, sc);
+  }
+
+  /* ------------- duas linhas com troca de cor suave ------------- */
+  function duo(a, b, t, size, cTop, cBot, beat){
+    var inK  = ease(clamp(t / .20, 0, 1));
+    var sc   = (1 + .20 * (1 - inK)) * (1 + .010 * Math.sin(t * 6.4));
+    var ph   = (t / beat) % 2;
+    var k    = easeIO(clamp((ph < 1 ? ph : ph - 1) / .34, 0, 1));
+    var flip = ph < 1 ? k : 1 - k;                   // 0..1 contínuo, vai e volta
+    var yT = H/2 - size*.56 + (1 - inK) * 22;
+    var yB = H/2 + size*.56 - (1 - inK) * 22;
+    word(a, W/2, yT, size, cTop, inK * (1 - flip), sc);
+    word(a, W/2, yT, size, cBot, inK * flip,       sc);
+    word(b, W/2, yB, size, cBot, inK * (1 - flip), sc);
+    word(b, W/2, yB, size, cTop, inK * flip,       sc);
+  }
+
+  /* ---------------- roteiro (9,4 s) — paleta invertida ----------------
+     Abertura e refrão em LARANJA cheio; miolo em creme/areia;
+     o bloco de ação em marrom escuro.                                   */
+  var SC = [
+    // 1 — OU OU OU · fundo todo laranja
+    { t0:0.00, t1:2.30, f:function(t){
+        bg(C.laranja);
+        var s = fit('OU', W*.52, 200);
+        stack({ text:'OU', t:t - .10, beat:.26, n:5, size:s, lineH:s*1.02,
+                solid:C.creme, ghostColor:C.creme, ghostAlpha:.26 });
+      }},
+    // 2 — JÁ CONFERIU · laranja
+    { t0:2.30, t1:3.45, f:function(t){
+        bg(C.laranja);
+        var s = Math.min(fit('JÁ', W*.32, 190), fit('CONFERIU', W*.82, 190));
+        duo('JÁ', 'CONFERIU', t, s, C.creme, C.marrom, .30);
+      }},
+    // 3 — SUA SUA SUA · vira claro
+    { t0:3.45, t1:3.86, f:function(t){
+        bg(C.creme);
+        var s = fit('SUA', W*.50, 200);
+        stack({ text:'SUA', t:t, beat:.12, n:3, size:s, lineH:s*1.02,
+                solid:C.marrom, ghostColor:C.marrom, ghostAlpha:.20 });
+      }},
+    // 4 — MELHOR MELHOR MELHOR
+    { t0:3.86, t1:4.20, f:function(t){
+        bg(C.creme);
+        var s = fit('MELHOR', W*.66, 200);
+        stack({ text:'MELHOR', t:t, beat:.10, n:3, size:s, lineH:s*1.05,
+                solid:C.laranja, ghostColor:C.laranja, ghostAlpha:.24 });
+      }},
+    // 5 — LOJINHA · bloco escuro
+    { t0:4.20, t1:4.56, f:function(t){
+        bg(C.marrom); beatWord('LOJINHA', t, .36, fit('LOJINHA', W*.74, 190), C.areia);
+      }},
+    // 6 — DE POD
+    { t0:4.56, t1:4.94, f:function(t){
+        bg(C.marrom); beatWord('DE POD', t, .38, fit('DE POD', W*.74, 190), C.laranja3);
+      }},
+    // 7 — VEM
+    { t0:4.94, t1:5.30, f:function(t){
+        bg(C.marrom); beatWord('VEM', t, .36, fit('VEM', W*.56, 200), C.creme);
+      }},
+    // 8 — TEM PROMO · volta o laranja cheio
+    { t0:5.30, t1:5.70, f:function(t){
+        bg(C.laranja);
+        var s = Math.min(fit('TEM', W*.44, 190), fit('PROMO', W*.80, 190));
+        duo('TEM', 'PROMO', t, s, C.creme, C.marrom, .26);
+      }},
+    // 9 — HOJE
+    { t0:5.70, t1:6.08, f:function(t){
+        bg(C.laranja); beatWord('HOJE', t, .38, fit('HOJE', W*.68, 200), C.creme);
+      }},
+    // 10 — HOJE em cascata · escuro com eco laranja
+    { t0:6.08, t1:6.84, f:function(t){
+        bg(C.marrom);
+        var s = fit('HOJE', W*.60, 150);
+        stack({ text:'HOJE', t:t, beat:.078, n:9, size:s, lineH:s*.98,
+                solid:C.areia, ghostColor:C.laranja2, ghostAlpha:.55 });
+      }},
+    // 11 — SIGA · laranja
+    { t0:6.84, t1:7.26, f:function(t){
+        bg(C.laranja);
+        var s = fit('SIGA', W*.62, 210);
+        var inK = ease(clamp(t / .24, 0, 1));
+        var sc  = (1 + .26 * (1 - inK)) * (1 + .014 * Math.sin(t * 6.8));
+        word('SIGA', W/2, H/2 + (1 - inK) * 30, s, C.creme, inK, sc);
+      }},
+    // 12 — logo Sunset: o sol nasce, o letreiro sobe atrás dele
+    { t0:7.26, t1:9.40, f:function(t){
+        var lw = W * .82, k = lw / (LOGO_N || 1254);
+        var ox = W/2 - lw/2, oy = H*.44 - lw/2;
+        var solX = ox + L.solCx * k, solY = oy + L.solCy * k;
+
+        // 1) o laranja da cena anterior recua num círculo centrado no sol
+        bg(C.laranja);
+        var rev = easeIO(clamp(t / .46, 0, 1));
+        if (rev > 0){
+          var rMax = Math.hypot(Math.max(solX, W - solX), Math.max(solY, H - solY)) + 8;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(solX, solY, rMax * rev, 0, Math.PI * 2);
+          ctx.fillStyle = logoBg || C.areia;
+          ctx.fill();
+          ctx.restore();
+        }
+        if (!spSol) return;
+
+        // 2) o sol nasce: sobe, cresce com recuo elástico e assenta o giro
+        var sK  = clamp((t - .08) / .70, 0, 1);
+        var sE  = backOut(sK);
+        var sSc = .52 + .48 * sE;
+        var sRot = (-26 * (1 - sE)) * Math.PI/180 + Math.sin(t * .85) * .012;
+        var sDy = (1 - ease(sK)) * lw * .17;
+        sprite(spSol, ox, oy, k, L.solCx, L.solCy,
+               { alpha:clamp(sK * 2.6, 0, 1), scale:sSc, rot:sRot, dy:sDy });
+
+        // 3) "Sunset" sobe por trás de uma máscara
+        var wK = ease(clamp((t - .46) / .46, 0, 1));
+        sprite(spLetra, ox, oy, k, L.solCx, L.letraY0,
+               { alpha:wK, dy:(1 - wK) * (L.letraY1 - L.letraY0) * k * .85,
+                 clip:[0, oy + L.letraY0 * k, W, (L.letraY1 - L.letraY0) * k] });
+
+        // 4) "pod" + montanhas, meio tempo depois
+        var pK = ease(clamp((t - .74) / .44, 0, 1));
+        sprite(spLetra, ox, oy, k, L.solCx, L.podY0,
+               { alpha:pK, dy:(1 - pK) * (L.podY1 - L.podY0) * k * .8,
+                 clip:[0, oy + L.podY0 * k, W, (L.podY1 - L.podY0) * k + 4] });
+
+        // 5) assinatura
+        var a = ease(clamp((t - 1.02) / .42, 0, 1));
+        word('@sunsetpodrj', W/2, H*.80 - (1 - a) * 20,
+             fit('@sunsetpodrj', W*.54, 90), C.laranja, a, 1);
+        var a2 = ease(clamp((t - 1.18) / .42, 0, 1));
+        ctx.save();
+        ctx.globalAlpha = a2; ctx.fillStyle = C.marrom;
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = '700 30px "Outfit", system-ui, sans-serif';
+        ctx.fillText('ENTREGA NO RIO • CHAMA NO WHATS', W/2, H*.855 - (1 - a2) * 14);
+        ctx.restore();
+      }}
+  ];
+
+  var DUR = SC[SC.length - 1].t1;
+
+  function render(time){
+    var t = clamp(time, 0, DUR - .001), sc = SC[0];
+    for (var i = 0; i < SC.length; i++){
+      if (t >= SC[i].t0 && t < SC[i].t1){ sc = SC[i]; break; }
+    }
+    sc.f(t - sc.t0);
+    grainPass();
+  }
+
+  /* ---------------- reprodução ---------------- */
+  var raf = 0, running = false;
+  function play(done){
+    cancelAnimationFrame(raf);
+    running = true;
+    var start = performance.now();
+    (function step(now){
+      var t = (now - start) / 1000;
+      if (t >= DUR){ render(DUR - .01); running = false; if (done) done(); return; }
+      render(t);
+      raf = requestAnimationFrame(step);
+    })(performance.now());
+  }
+
+  var elPlay = document.getElementById('play');
+  var elRec  = document.getElementById('rec');
+  var elSt   = document.getElementById('status');
+
+  elPlay.addEventListener('click', function(){ elSt.textContent = ''; play(); });
+
+  elRec.addEventListener('click', function(){
+    if (!window.MediaRecorder || !cv.captureStream){
+      elSt.textContent = 'Gravação indisponível neste navegador.';
+      return;
+    }
+    // mp4/H.264 primeiro (é o que o Instagram aceita); webm só como reserva
+    var mime = ['video/mp4;codecs="avc1.640028"','video/mp4;codecs=avc1','video/mp4',
+                'video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm']
+      .filter(function(m){ return MediaRecorder.isTypeSupported(m); })[0];
+    var ext  = mime.indexOf('mp4') >= 0 ? 'mp4' : 'webm';
+    var type = 'video/' + ext;
+    var rec = new MediaRecorder(cv.captureStream(60), { mimeType:mime, videoBitsPerSecond:12000000 });
+    var chunks = [];
+    rec.ondataavailable = function(e){ if (e.data.size) chunks.push(e.data); };
+    rec.onstop = function(){
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob(chunks, { type:type }));
+      a.download = 'sunset-reels.' + ext;
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+      elRec.disabled = false; elPlay.disabled = false;
+      elSt.textContent = 'Pronto — sunset-reels.' + ext + ' baixado.';
+    };
+    elRec.disabled = true; elPlay.disabled = true;
+    elSt.textContent = 'Gravando…';
+    rec.start();
+    play(function(){ setTimeout(function(){ rec.stop(); }, 260); });
+  });
+
+  window.SUNSET = { render: render, play: play, DUR: DUR };
+
+  function boot(){ render(.9); }
+  if (document.fonts && document.fonts.load){
+    Promise.all([
+      document.fonts.load('400 100px "Lilita One"'),
+      document.fonts.load('700 30px "Outfit"')
+    ]).then(boot, boot);
+  } else {
+    boot();
+  }
+  logo.onload = function(){
+    try { buildSprites(); }
+    catch (e) { spSol = spLetra = null; logoBg = null; }
+    if (!running) render(.9);
+  };
+})();
+</script>
+</body>
+</html>

@@ -245,6 +245,49 @@
     });
   }
 
+  /* ================= botão elástico ("Conferir loja") =================
+     Mola de verdade: velocidade e amortecimento a cada quadro, em vez de
+     uma curva pronta. Ela oscila e assenta sozinha.                     */
+  function molaBotao() {
+    var btn = $('.btn-big');
+    if (!btn || reduced) return;
+
+    var escala = 1, vel = 0, alvo = 1, quadro = null, visivel = true;
+
+    function passo() {
+      var forca = (alvo - escala) * 0.22;   // rigidez da mola
+      vel = (vel + forca) * 0.72;           // amortecimento
+      escala += vel;
+
+      // assentou: encosta no alvo e dorme, pra não segurar um rAF eterno
+      if (Math.abs(vel) < 0.0003 && Math.abs(alvo - escala) < 0.001) {
+        escala = alvo; quadro = null;
+        btn.style.transform = alvo === 1 ? '' : 'scale(' + alvo + ')';
+        return;
+      }
+      btn.style.transform = 'scale(' + escala.toFixed(4) + ')';
+      quadro = requestAnimationFrame(passo);
+    }
+
+    function acordar() { if (!quadro && visivel) quadro = requestAnimationFrame(passo); }
+    function mira(v) { alvo = v; acordar(); }
+
+    btn.addEventListener('pointerenter', function () { mira(1.14); });
+    btn.addEventListener('pointerleave', function () { mira(1); });
+    btn.addEventListener('pointerdown', function () { mira(0.9); });
+    btn.addEventListener('pointerup', function () { mira(1.14); });
+    btn.addEventListener('pointercancel', function () { mira(1); });
+
+    // só gasta quadro enquanto o botão está em cena
+    if (global.IntersectionObserver) {
+      new IntersectionObserver(function (e) {
+        visivel = e[0].isIntersecting;
+        if (visivel) acordar();
+        else if (quadro) { cancelAnimationFrame(quadro); quadro = null; }
+      }, { threshold: 0 }).observe(btn);
+    }
+  }
+
   /* ================= faixa animada ================= */
   function buildTicker() {
     var t = $('#tickerTrack');
@@ -285,6 +328,7 @@
     fitSea();
     if (mqEstreito && mqEstreito.addEventListener) mqEstreito.addEventListener('change', fitSea);
     bindCarousel();
+    molaBotao();
     refresh();
 
     global.addEventListener('scroll', onScroll, { passive: true });
